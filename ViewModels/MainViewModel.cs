@@ -10,20 +10,14 @@ namespace LogSluice.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
-    [ObservableProperty] private LogTabViewModel? _selectedTab;
-
-    // UI State
-    [ObservableProperty] private bool _hasTabs;
-
     public ObservableCollection<LogTabViewModel> Tabs { get; } = new();
 
-    // Application Settings Exposed to UI
+    [ObservableProperty] private LogTabViewModel? _selectedTab;
+    [ObservableProperty] private bool _hasTabs;
     [ObservableProperty] private ObservableCollection<string> _recentFiles;
     [ObservableProperty] private ObservableCollection<HighlightRule> _globalRules;
     [ObservableProperty] private bool _followTailDefault;
     [ObservableProperty] private bool _wrapTextDefault;
-
-    // New rule binding properties for the global settings view
     [ObservableProperty] private string _newHighlightPattern = string.Empty;
     [ObservableProperty] private Color _newHighlightColor = Colors.Red;
 
@@ -38,7 +32,6 @@ public partial class MainViewModel : ObservableObject
         FollowTailDefault = CurrentSettings.FollowTailDefault;
         WrapTextDefault = CurrentSettings.WrapTextDefault;
 
-        // Require explicit click from Recent Files for cleaner startup
         UpdateTabState();
     }
 
@@ -51,7 +44,6 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        // Pass 'this' as the parent
         var newTab = new LogTabViewModel(path, this, FollowTailDefault, WrapTextDefault);
         Tabs.Add(newTab);
         SelectedTab = newTab;

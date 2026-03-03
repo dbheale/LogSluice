@@ -34,14 +34,12 @@ public partial class MainWindow : Window
     
     private async void OpenFileButton_Click(object? sender, RoutedEventArgs e)
     {
-        // 1. Open the native OS file picker
         var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             Title = "Open Log File",
             AllowMultiple = true // Let users select multiple logs at once!
         });
 
-        // 2. If they picked files, pass them to our ViewModel
         if (files.Count >= 1)
         {
             var vm = DataContext as MainViewModel;

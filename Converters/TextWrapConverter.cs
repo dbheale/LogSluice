@@ -7,7 +7,6 @@ namespace LogSluice.Converters;
 
 public class TextWrapConverter : IValueConverter
 {
-    // A static instance makes it incredibly easy to use in XAML
     public static readonly TextWrapConverter Instance = new();
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)

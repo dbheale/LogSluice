@@ -6,7 +6,6 @@ using System.Text.Json;
 
 namespace LogSluice.Services;
 
-// The data model for our JSON file
 public class AppSettings
 {
     public List<string> RecentFiles { get; set; } = new();
@@ -14,7 +13,6 @@ public class AppSettings
     public bool FollowTailDefault { get; set; } = true;
     public bool WrapTextDefault { get; set; } = false;
 }
-// Keep SettingsService class exactly as it was
 
 public static class SettingsService
 {
@@ -33,13 +31,13 @@ public static class SettingsService
         }
         catch
         {
-            return new AppSettings(); // Fallback if file is corrupted
+            return new AppSettings();
         }
     }
 
     public static void Save(AppSettings settings)
     {
-        Directory.CreateDirectory(ConfigFolder); // Ensure the folder exists
+        Directory.CreateDirectory(ConfigFolder);
         var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(ConfigFile, json);
     }
