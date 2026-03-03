@@ -1,0 +1,47 @@
+name: Build LogSluice Releases
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # Allows you to run this manually from the GitHub Actions tab
+
+jobs:
+  build:
+    name: Build for ${{ matrix.os }} (${{ matrix.rid }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+            artifact_name: LogSluice-Windows-x64
+          - os: macos-latest
+            rid: osx-arm64
+            artifact_name: LogSluice-macOS-AppleSilicon
+          - os: macos-latest
+            rid: osx-x64
+            artifact_name: LogSluice-macOS-Intel
+          - os: ubuntu-latest
+            rid: linux-x64
+            artifact_name: LogSluice-Linux-x64
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET 10
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+
+    - name: Publish Single-File Executable
+    
+      run: dotnet publish -c Release -r ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=true -o ./publish_output
+
+    - name: Upload Finished Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.artifact_name }}
+        path: ./publish_output

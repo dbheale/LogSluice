@@ -1,0 +1,178 @@
+<Window xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:LogSluice.ViewModels"
+    xmlns:converters="using:LogSluice.Converters"
+    xmlns:behaviors="using:LogSluice.Behaviors" x:Class="LogSluice.Views.MainWindow" x:DataType="vm:MainViewModel" Icon="/Assets/avalonia-logo.ico" Title="Log Sluice" DragDrop.AllowDrop="True" Background="#1E1E1E">
+
+    <Grid RowDefinitions="Auto, *">
+        <Border Grid.Row="0" Background="#252526" Padding="15,10">
+            <Grid ColumnDefinitions="*, Auto">
+                <TextBlock Grid.Column="0" Text="Log Sluice" VerticalAlignment="Center" FontWeight="Bold" FontSize="16" Foreground="White"/>
+
+                <Button Grid.Column="1" Content="📂 Open File" Click="OpenFileButton_Click" Background="#333337" Foreground="White" BorderBrush="#3E3E42" Cursor="Hand" Padding="15,5"/>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" IsVisible="{Binding !HasTabs}" ColumnDefinitions="*, 400" Background="#1E1E1E">
+
+            <Border Grid.Column="0" Background="#1E1E1E" Padding="40">
+                <StackPanel Spacing="15">
+                    <TextBlock Text="Drop a log file here to begin." FontSize="24" Foreground="#CCC"/>
+                    <TextBlock Text="Recent Files" FontSize="18" FontWeight="SemiBold" Foreground="White" Margin="0,20,0,0"/>
+                    <ItemsControl ItemsSource="{Binding RecentFiles}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Content="{Binding}" Command="{Binding $parent[ItemsControl].((vm:MainViewModel)DataContext).OpenFileCommand}" CommandParameter="{Binding}" Background="Transparent" Foreground="#4A90E2" HorizontalAlignment="Left" Padding="0,5" Cursor="Hand"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Button Content="Clear Recent" Command="{Binding ClearRecentFilesCommand}" Background="Transparent" Foreground="#888" Margin="0,10,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1" Background="#252526" Padding="20">
+                <StackPanel Spacing="15">
+                    <TextBlock Text="Global Defaults" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
+                    <CheckBox IsChecked="{Binding FollowTailDefault}" Content="Follow Tail on Open" Foreground="White"/>
+                    <CheckBox IsChecked="{Binding WrapTextDefault}" Content="Wrap Text on Open" Foreground="White"/>
+
+                    <Separator Background="#3E3E42" Margin="0,10"/>
+
+                    <TextBlock Text="Global Highlights" FontSize="16" FontWeight="SemiBold" Foreground="White"/>
+                    <Grid ColumnDefinitions="*, Auto">
+                        <TextBox Grid.Column="0" Watermark="Match Text" Text="{Binding NewHighlightPattern}" Background="#333337" Foreground="#FFFFFF" BorderBrush="#3E3E42" CaretBrush="White" Margin="0,0,10,0"/>
+                        <ColorPicker Grid.Column="1" Color="{Binding NewHighlightColor}" CornerRadius="3" VerticalAlignment="Stretch"/>
+                    </Grid>
+                    <Button Content="Add Global Highlight" Command="{Binding AddGlobalHighlightCommand}" Background="#007ACC" Foreground="White"/>
+
+                    <ItemsControl ItemsSource="{Binding GlobalRules}" Margin="0,10,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="*, Auto" Margin="0,3">
+                                    <Border Grid.Column="0" Background="{Binding Background}" Padding="8,4" CornerRadius="3">
+                                        <TextBlock Text="{Binding Pattern}" Foreground="{Binding Foreground}" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <Button Grid.Column="1" Content="✕" Command="{Binding $parent[ItemsControl].((vm:MainViewModel)DataContext).RemoveGlobalHighlightCommand}" CommandParameter="{Binding}" Margin="5,0,0,0" Padding="10,4" Foreground="White" Background="#CC0000" Cursor="Hand"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <TabControl Grid.Row="1" Background="#1E1E1E" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab}" IsVisible="{Binding HasTabs}">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="{Binding Title}" VerticalAlignment="Center" Foreground="White"/>
+                        <Button Content="✕" Command="{Binding $parent[TabControl].((vm:MainViewModel)DataContext).CloseTabCommand}" CommandParameter="{Binding}" Background="Transparent" BorderThickness="0" Foreground="#888" Padding="5,0" Cursor="Hand"/>
+                    </StackPanel>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate DataType="vm:LogTabViewModel">
+                    <Grid ColumnDefinitions="*, Auto">
+                        <Grid Grid.Column="0" RowDefinitions="Auto, *">
+
+                            <Border Grid.Row="0" Background="#252526" Padding="15,8" BorderBrush="#3E3E42" BorderThickness="0,0,1,1">
+                                <Grid ColumnDefinitions="Auto, *, Auto">
+                                    <TextBlock Grid.Column="0" Text="🔍" VerticalAlignment="Center" Foreground="#888" Margin="0,0,10,0"/>
+                                    <TextBox Grid.Column="1" Watermark="Find in current log..." Text="{Binding SearchText}" Background="#1E1E1E" Foreground="White" BorderThickness="1" BorderBrush="#3E3E42" CaretBrush="White" CornerRadius="3"/>
+                                    <ToggleButton Grid.Column="2" IsChecked="{Binding IsSidebarVisible}" Content="⚙️ Settings" Background="Transparent" Foreground="#CCC" BorderBrush="#3E3E42" Margin="10,0,0,0" Cursor="Hand" ToolTip.Tip="Toggle Tab Settings"/>
+                                </Grid>
+                            </Border>
+
+                            <ScrollViewer Name="LogScroller" Grid.Row="1" behaviors:ScrollBehavior.AutoScroll="{Binding FollowTail, Mode=TwoWay}" Background="#1E1E1E">
+                                <ItemsRepeater ItemsSource="{Binding Lines}">
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Padding="2,0">
+                                                <Border.Background>
+                                                    <MultiBinding Converter="{x:Static converters:HighlightRuleConverter.Instance}" ConverterParameter="Background">
+                                                        <Binding />
+                                                        <Binding Path="$parent[ScrollViewer].((vm:LogTabViewModel)DataContext).ActiveRules" />
+                                                    </MultiBinding>
+                                                </Border.Background>
+                                                <SelectableTextBlock Text="{Binding}" MaxWidth="8000" FontFamily="{Binding $parent[ScrollViewer].((vm:LogTabViewModel)DataContext).FontFamily}" FontSize="{Binding $parent[ScrollViewer].((vm:LogTabViewModel)DataContext).FontSize}" TextWrapping="{Binding $parent[ScrollViewer].((vm:LogTabViewModel)DataContext).WrapText, Converter={x:Static converters:TextWrapConverter.Instance}}">
+                                                    <SelectableTextBlock.Foreground>
+                                                        <MultiBinding Converter="{x:Static converters:HighlightRuleConverter.Instance}" ConverterParameter="Foreground">
+                                                            <Binding />
+                                                            <Binding Path="$parent[ScrollViewer].((vm:LogTabViewModel)DataContext).ActiveRules" />
+                                                        </MultiBinding>
+                                                    </SelectableTextBlock.Foreground>
+                                                </SelectableTextBlock>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+                            </ScrollViewer>
+                        </Grid>
+
+                        <Border Grid.Column="1" Width="250" IsVisible="{Binding IsSidebarVisible}" Background="#252526" Padding="15">
+                            <ScrollViewer>
+                                <StackPanel Spacing="10">
+                                    <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,5">
+                                        <TextBlock Text="Tab Settings" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                                        <Button Grid.Column="1" Content="✕" Command="{Binding ToggleSidebarCommand}" Background="Transparent" BorderThickness="0" Foreground="#888" Padding="5,0" Cursor="Hand" ToolTip.Tip="Close Settings"/>
+                                    </Grid>
+
+                                    <CheckBox IsChecked="{Binding FollowTail}" Content="Follow Tail" Foreground="#CCC"/>
+                                    <CheckBox IsChecked="{Binding WrapText}" Content="Word Wrap" Foreground="#CCC"/>
+
+                                    <TextBlock Text="Font Settings" Foreground="White" FontWeight="SemiBold" Margin="0,5,0,0"/>
+                                    <NumericUpDown Value="{Binding FontSize}" Minimum="8" Maximum="36" FormatString="0" Foreground="White" Background="#333337" BorderBrush="#3E3E42"/>
+                                    <ComboBox SelectedItem="{Binding FontFamily}" ItemsSource="{Binding AvailableFonts}" HorizontalAlignment="Stretch" Background="#333337" Foreground="White" BorderBrush="#3E3E42">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name}" FontFamily="{Binding}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+
+                                    <Separator Background="#3E3E42" Margin="0,10"/>
+
+                                    <TextBlock Text="Add Highlight" Foreground="White" FontWeight="SemiBold"/>
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <TextBox Grid.Column="0" Watermark="Match Text" Text="{Binding NewHighlightPattern}" Background="#333337" Foreground="#FFFFFF" BorderBrush="#3E3E42" CaretBrush="White" Margin="0,0,10,0"/>
+                                        <ColorPicker Grid.Column="1" Color="{Binding NewHighlightColor}" CornerRadius="3" VerticalAlignment="Stretch"/>
+                                    </Grid>
+                                    <CheckBox Content="Save as Global Highlight" IsChecked="{Binding IsGlobalRule}" Foreground="#CCC"/>
+                                    <Button Content="Add Highlight" Command="{Binding AddHighlightCommand}" Background="#007ACC" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+
+                                    <TextBlock Text="Tab Highlights" FontSize="14" FontWeight="SemiBold" Foreground="White" Margin="0,10,0,0"/>
+                                    <ItemsControl ItemsSource="{Binding LocalRules}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid ColumnDefinitions="*, Auto" Margin="0,3">
+                                                    <Border Grid.Column="0" Background="{Binding Background}" Padding="8,4" CornerRadius="3">
+                                                        <TextBlock Text="{Binding Pattern}" Foreground="{Binding Foreground}" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    <Button Grid.Column="1" Content="✕" Command="{Binding $parent[ItemsControl].((vm:LogTabViewModel)DataContext).RemoveLocalHighlightCommand}" CommandParameter="{Binding}" Margin="5,0,0,0" Padding="10,4" Foreground="White" Background="#CC0000" Cursor="Hand"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <TextBlock Text="Global Highlights" FontSize="14" FontWeight="SemiBold" Foreground="White" Margin="0,10,0,0"/>
+                                    <ItemsControl ItemsSource="{Binding GlobalRules}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid ColumnDefinitions="*, Auto" Margin="0,3">
+                                                    <Border Grid.Column="0" Background="{Binding Background}" Padding="8,4" CornerRadius="3">
+                                                        <TextBlock Text="{Binding Pattern}" Foreground="{Binding Foreground}" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    <Button Grid.Column="1" Content="✕" Command="{Binding $parent[TabControl].((vm:MainViewModel)DataContext).RemoveGlobalHighlightCommand}" CommandParameter="{Binding}" Margin="5,0,0,0" Padding="10,4" Foreground="White" Background="#CC0000" Cursor="Hand"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Border>
+                    </Grid>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+    </Grid>
+</Window>
