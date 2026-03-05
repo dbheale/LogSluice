@@ -148,6 +148,5 @@ public partial class LogTabViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         _timer.Stop();
-        Lines.Dispose();
     }
 }
