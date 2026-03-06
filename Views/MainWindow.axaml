@@ -3,7 +3,6 @@
     xmlns:vm="using:LogSluice.ViewModels"
     xmlns:converters="using:LogSluice.Converters"
     xmlns:behaviors="using:LogSluice.Behaviors" x:Class="LogSluice.Views.MainWindow" x:DataType="vm:MainViewModel" Icon="/Assets/avalonia-logo.ico" Title="Log Sluice" DragDrop.AllowDrop="True" Background="#1E1E1E">
-
     <Grid RowDefinitions="Auto, *">
         <Border Grid.Row="0" Background="#252526" Padding="15,10">
             <Grid ColumnDefinitions="*, Auto">
@@ -39,9 +38,13 @@
                     <Separator Background="#3E3E42" Margin="0,10"/>
 
                     <TextBlock Text="Global Highlights" FontSize="16" FontWeight="SemiBold" Foreground="White"/>
-                    <Grid ColumnDefinitions="*, Auto">
-                        <TextBox Grid.Column="0" Watermark="Match Text" Text="{Binding NewHighlightPattern}" Background="#333337" Foreground="#FFFFFF" BorderBrush="#3E3E42" CaretBrush="White" Margin="0,0,10,0"/>
+                    <Grid ColumnDefinitions="*, Auto, Auto">
+                        <TextBox Grid.Column="0" Watermark="Match Text" Text="{Binding NewHighlightPattern}" 
+                            Background="{Binding NewHighlightColor, Converter={x:Static converters:ColorToBrushConverter.Instance}}" 
+                            Foreground="{Binding NewForegroundColor, Converter={x:Static converters:ColorToBrushConverter.Instance}}" 
+                            BorderBrush="#3E3E42" CaretBrush="White" Margin="0,0,10,0"/>
                         <ColorPicker Grid.Column="1" Color="{Binding NewHighlightColor}" CornerRadius="3" VerticalAlignment="Stretch"/>
+                        <ColorPicker Grid.Column="2" Color="{Binding NewForegroundColor}" CornerRadius="3" VerticalAlignment="Stretch"/>
                     </Grid>
                     <Button Content="Add Global Highlight" Command="{Binding AddGlobalHighlightCommand}" Background="#007ACC" Foreground="White"/>
 
@@ -52,7 +55,7 @@
                                     <Border Grid.Column="0" Background="{Binding Background}" Padding="8,4" CornerRadius="3">
                                         <TextBlock Text="{Binding Pattern}" Foreground="{Binding Foreground}" VerticalAlignment="Center"/>
                                     </Border>
-                                    <Button Grid.Column="1" Content="✕" Command="{Binding $parent[ItemsControl].((vm:MainViewModel)DataContext).RemoveGlobalHighlightCommand}" CommandParameter="{Binding}" Margin="5,0,0,0" Padding="10,4" Foreground="White" Background="#CC0000" Cursor="Hand"/>
+                                    <Button Grid.Column="1" Content="🗑️" Command="{Binding $parent[ItemsControl].((vm:MainViewModel)DataContext).RemoveGlobalHighlightCommand}" CommandParameter="{Binding}" Margin="5,0,0,0" Padding="10,4" Foreground="White" Background="#CC0000" Cursor="Hand"/>
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -109,7 +112,7 @@
                             </ScrollViewer>
                         </Grid>
 
-                        <Border Grid.Column="1" Width="250" IsVisible="{Binding IsSidebarVisible}" Background="#252526" Padding="15">
+                        <Border Grid.Column="1" Width="300" IsVisible="{Binding IsSidebarVisible}" Background="#252526" Padding="15">
                             <ScrollViewer>
                                 <StackPanel Spacing="10">
                                     <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,5">
@@ -133,9 +136,13 @@
                                     <Separator Background="#3E3E42" Margin="0,10"/>
 
                                     <TextBlock Text="Add Highlight" Foreground="White" FontWeight="SemiBold"/>
-                                    <Grid ColumnDefinitions="*, Auto">
-                                        <TextBox Grid.Column="0" Watermark="Match Text" Text="{Binding NewHighlightPattern}" Background="#333337" Foreground="#FFFFFF" BorderBrush="#3E3E42" CaretBrush="White" Margin="0,0,10,0"/>
+                                    <Grid ColumnDefinitions="*, Auto, Auto">
+                                        <TextBox Grid.Column="0" Watermark="Match Text" Text="{Binding NewHighlightPattern}" 
+                                            Background="{Binding NewHighlightColor, Converter={x:Static converters:ColorToBrushConverter.Instance}}" 
+                                            Foreground="{Binding NewForegroundColor, Converter={x:Static converters:ColorToBrushConverter.Instance}}" 
+                                            BorderBrush="#3E3E42" CaretBrush="White" Margin="0,0,10,0"/>
                                         <ColorPicker Grid.Column="1" Color="{Binding NewHighlightColor}" CornerRadius="3" VerticalAlignment="Stretch"/>
+                                        <ColorPicker Grid.Column="2" Color="{Binding NewForegroundColor}" CornerRadius="3" VerticalAlignment="Stretch"/>
                                     </Grid>
                                     <CheckBox Content="Save as Global Highlight" IsChecked="{Binding IsGlobalRule}" Foreground="#CCC"/>
                                     <Button Content="Add Highlight" Command="{Binding AddHighlightCommand}" Background="#007ACC" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
@@ -148,7 +155,7 @@
                                                     <Border Grid.Column="0" Background="{Binding Background}" Padding="8,4" CornerRadius="3">
                                                         <TextBlock Text="{Binding Pattern}" Foreground="{Binding Foreground}" VerticalAlignment="Center"/>
                                                     </Border>
-                                                    <Button Grid.Column="1" Content="✕" Command="{Binding $parent[ItemsControl].((vm:LogTabViewModel)DataContext).RemoveLocalHighlightCommand}" CommandParameter="{Binding}" Margin="5,0,0,0" Padding="10,4" Foreground="White" Background="#CC0000" Cursor="Hand"/>
+                                                    <Button Grid.Column="1" Content="🗑️" Command="{Binding $parent[ItemsControl].((vm:LogTabViewModel)DataContext).RemoveLocalHighlightCommand}" CommandParameter="{Binding}" Margin="5,0,0,0" Padding="10,4" Foreground="White" Background="#CC0000" Cursor="Hand"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>

@@ -29,6 +29,7 @@ public partial class LogTabViewModel : ObservableObject, IDisposable
     [ObservableProperty] private FontFamily _fontFamily = FontFamily.Parse("Consolas");
     [ObservableProperty] private string _newHighlightPattern = string.Empty;
     [ObservableProperty] private Color _newHighlightColor = Colors.Red;
+    [ObservableProperty] private Color _newForegroundColor = Colors.White;
     [ObservableProperty] private bool _isGlobalRule = false; // The CheckBox state
     [ObservableProperty] private ObservableCollection<HighlightRule> _localRules = new();
     [ObservableProperty] private ObservableCollection<HighlightRule> _globalRules = new();
@@ -108,7 +109,7 @@ public partial class LogTabViewModel : ObservableObject, IDisposable
             {
                 Pattern = NewHighlightPattern,
                 BackgroundColorName = NewHighlightColor.ToString(),
-                ForegroundColorName = "White"
+                ForegroundColorName = NewForegroundColor.ToString()
             };
 
             if (IsGlobalRule)

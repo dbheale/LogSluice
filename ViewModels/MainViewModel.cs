@@ -20,6 +20,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool _wrapTextDefault;
     [ObservableProperty] private string _newHighlightPattern = string.Empty;
     [ObservableProperty] private Color _newHighlightColor = Colors.Red;
+    [ObservableProperty] private Color _newForegroundColor = Colors.White;
 
     public AppSettings CurrentSettings { get; private set; }
 
@@ -99,7 +100,7 @@ public partial class MainViewModel : ObservableObject
             {
                 Pattern = NewHighlightPattern,
                 BackgroundColorName = NewHighlightColor.ToString(),
-                ForegroundColorName = "White"
+                ForegroundColorName = NewForegroundColor.ToString()
             };
             var updatedRules = new ObservableCollection<HighlightRule>(GlobalRules) { newRule };
             GlobalRules = updatedRules;
